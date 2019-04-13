@@ -1,47 +1,129 @@
 const { name } = require("./package.json")
 
-const siteUrl =
-  process.env.URL || process.env.DEPLOY_URL || ""
+const siteUrl = process.env.URL || process.env.DEPLOY_URL || ""
 
 module.exports = {
   pathPrefix: process.env.CI ? `/${name}` : `/`,
-  siteMetadata: { // initialize site metadata for SEO
+  siteMetadata: {
+    // initialize site metadata for SEO
     title: ``,
     description: ``,
-    author: {
-        name: ``, 
-    }, 
+    author: ``,
     siteUrl,
-    siteVerification: ``,
-    social: { //usernames for SEO
+    siteVerification: {
+      google: ``,
+      bing: ``,
+    },
+    social: {
+      //usernames for SEO
       twitter: "",
-      linkedin: ""
+      linkedin: "",
     },
-    socialLinks: { // profile URLS for social links, include https://
-        twitter: "",
-        linkedin: "",
-        facebook: "",
-        stackOverflow: "",
-        github: "",
-        instagram: "",
-        youtube: "",
-        email: "", //include mailto:
-        phone: "" //include tel:
+    socialLinks: {
+      // profile URLS for social links, include https://
+      twitter: "",
+      linkedin: "",
+      facebook: "",
+      stackOverflow: "",
+      github: "",
+      instagram: "",
+      youtube: "",
+      email: "", //include mailto:
+      phone: "", //include tel:
     },
-    keywords: [
-    ],
-    organization: { //update with relevant personal data
-      name: "", 
-      url: ""
-    }
+    keywords: [],
+    organization: {
+      //update with relevant personal data
+      name: "",
+      url: "",
+    },
   },
   plugins: [
     `gatsby-plugin-sitemap`,
     {
+      resolve: `gatsby-plugin-feed`,
+      options: {
+        query: `
+          {
+            site {
+              siteMetadata {
+                title
+                description
+                siteUrl
+                site_url: siteUrl,
+                author
+              }
+            }
+          }
+        `,
+        feeds: [
+          {
+            // adjust to fit your specific query
+            serialize: ({ query: { site, allMarkdownRemark } }) => {
+              return allMarkdownRemark.edges.map(edge => {
+                return Object.assign({}, edge.node.frontmatter, {
+                  language: `en-us`,
+                  title: edge.node.frontmatter.title,
+                  description: edge.node.excerpt,
+                  date: edge.node.frontmatter.date,
+                  url: site.siteMetadata.siteUrl + edge.node.frontmatter.path,
+                  guid: site.siteMetadata.siteUrl + edge.node.frontmatter.path,
+                  author:
+                    edge.node.frontmatter.author.email +
+                    `(` +
+                    edge.node.frontmatter.author.name +
+                    `)`,
+                  image: {
+                    url:
+                      site.siteMetadata.siteUrl +
+                      edge.node.frontmatter.featured.publicURL,
+                    title: edge.node.frontmatter.featuredAlt,
+                    link:
+                      site.siteMetadata.siteUrl + edge.node.frontmatter.path,
+                  },
+                  custom_elements: [{ "content:encoded": edge.node.html }],
+                })
+              })
+            },
+            // adjust below to fit markdown structure
+            query: `
+            {
+              allMarkdownRemark(
+                sort: { order: DESC, fields: [frontmatter___date] },
+              ) {
+                edges {
+                  node {
+                    excerpt
+                    html
+                    frontmatter {
+                      path
+                      date
+                      title
+                      featured {
+                        publicURL
+                      }
+                      featuredAlt
+                      author {
+                        name
+                        email
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            `,
+            output: "/rss.xml",
+            title: "RSS Feed", // update to add your site name + RSS Feed
+          },
+        ],
+      },
+    },
+    {
       resolve: `gatsby-plugin-google-analytics`,
       options: {
-        trackingId: `` // set up your own analytics account for this site and insert id here
-      }
+        trackingId: ``, // set up your own analytics account for this site and insert id here
+      },
     },
     {
       resolve: `gatsby-source-filesystem`,
@@ -50,22 +132,24 @@ module.exports = {
         path: `${__dirname}/src/`,
       },
     },
-    {
-      resolve: `gatsby-source-mongodb`,
-      options: { 
-        dbName: `gatsby`, 
-        collection: [`users`, `posts`, `comments`, `categories`],
-        server: {
-          address:`127.0.0.1`,
-          port: `27017`
-        },
-        auth: {
-          user: `admin`,
-          password: `abc123`
-        },
-        preserveObjectIds: true,
-      }
-    },
+    //
+    // REMOVE COMMENTS ONCE YOU ARE READY TO IMPORT DOCS
+    // {
+    //   resolve: `gatsby-source-mongodb`,
+    //   options: {
+    //     dbName: `gatsby`,
+    //     collection: [`users`, `posts`, `comments`, `categories`],
+    //     server: {
+    //       address: `127.0.0.1`,
+    //       port: `27017`,
+    //     },
+    //     auth: {
+    //       user: `admin`,
+    //       password: `abc123`,
+    //     },
+    //     preserveObjectIds: true,
+    //   },
+    // },
     {
       resolve: "gatsby-plugin-react-svg",
       options: {
@@ -87,24 +171,24 @@ module.exports = {
           },
           `gatsby-remark-copy-linked-files`,
           {
-            resolve: 'gatsby-remark-emojis',
+            resolve: "gatsby-remark-emojis",
             options: {
               // Deactivate the plugin globally (default: true)
-              active : true,
+              active: true,
               // Add a custom css class
-              class  : 'emoji-icon',
+              class: "emoji-icon",
               // Select the size (available size: 16, 24, 32, 64)
-              size   : 64,
+              size: 64,
               // Add custom styles
-              styles : {
-                display      : 'inline',
-                margin       : '0',
-                position     : 'relative',
-                top          : '2px',
-                width        : '19px'
-              }
-            }
-          }
+              styles: {
+                display: "inline",
+                margin: "0",
+                position: "relative",
+                top: "2px",
+                width: "19px",
+              },
+            },
+          },
         ],
       },
     },
@@ -113,10 +197,10 @@ module.exports = {
       resolve: `gatsby-plugin-web-font-loader`,
       options: {
         custom: {
-          families: ['komika_title-regular', 'komika_title-axis_regular'],
-          urls: ['/fonts/komikatitle_regular_macroman/stylesheet.css', '/fonts/komikatitle-axis_regular_macroman/stylesheet.css']
-        }
-      }
+          families: ["komika_title-regular", "komika_title-axis_regular"],
+          urls: ["/fonts/komika-reg.css", "/fonts/komika-axis.css"],
+        },
+      },
     },
     `gatsby-plugin-react-helmet`,
     `gatsby-transformer-sharp`,

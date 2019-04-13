@@ -1,9 +1,9 @@
 /**
- * 
+ *
  * Borrowed and Adapted from https://github.com/jlengstorf/gatsby-theme-jason-blog/blob/e6d25ca927afdc75c759e611d4ba6ba086452bb8/src/components/SEO/SchemaOrg.js
  */
-import React from 'react';
-import Helmet from 'react-helmet';
+import React from "react"
+import Helmet from "react-helmet"
 
 export default React.memo(
   ({
@@ -21,26 +21,26 @@ export default React.memo(
   }) => {
     const baseSchema = [
       {
-        '@context': 'http://schema.org',
-        '@type': 'WebSite',
+        "@context": "http://schema.org",
+        "@type": "WebSite",
         url,
         name: title,
         alternateName: defaultTitle,
       },
-    ];
+    ]
 
     const schema = isBlogPost
       ? [
           ...baseSchema,
           {
-            '@context': 'http://schema.org',
-            '@type': 'BreadcrumbList',
+            "@context": "http://schema.org",
+            "@type": "BreadcrumbList",
             itemListElement: [
               {
-                '@type': 'ListItem',
+                "@type": "ListItem",
                 position: 1,
                 item: {
-                  '@id': url,
+                  "@id": url,
                   name: title,
                   image,
                 },
@@ -48,47 +48,48 @@ export default React.memo(
             ],
           },
           {
-            '@context': 'http://schema.org',
-            '@type': 'BlogPosting',
+            "@context": "http://schema.org",
+            "@type": "BlogPosting",
             url,
             name: title,
             alternateName: defaultTitle,
             headline: title,
             image: {
-              '@type': 'ImageObject',
+              "@type": "ImageObject",
               url: image,
             },
             description,
             author: {
-              '@type': 'Person',
-              name: author,
+              "@type": "Person",
+              name: author.name,
+              email: author.email,
             },
             publisher: {
-              '@type': 'Organization',
+              "@type": "Organization",
               url: organization.url,
               logo: {
-                  '@type': 'ImageObject',
-                  url: organization.logo.url,
-                  width: organization.logo.width,
-                  height: organization.logo.height
+                "@type": "ImageObject",
+                url: organization.logo.url,
+                width: organization.logo.width,
+                height: organization.logo.height,
               },
               name: organization.name,
             },
             mainEntityOfPage: {
-              '@type': 'WebSite',
-              '@id': canonicalUrl,
+              "@type": "WebSite",
+              "@id": canonicalUrl,
             },
             datePublished,
-            dateModified
+            dateModified,
           },
         ]
-      : baseSchema;
+      : baseSchema
 
     return (
       <Helmet>
         {/* Schema.org tags */}
         <script type="application/ld+json">{JSON.stringify(schema)}</script>
       </Helmet>
-    );
-  },
-);
+    )
+  }
+)

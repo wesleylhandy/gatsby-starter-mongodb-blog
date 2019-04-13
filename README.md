@@ -17,11 +17,17 @@ For more information visit >> []
 
 ## Contributing
 
+Looking for contributors. The goal is the utilize MongoDB to store markdown as well as comments, users and sessions. So there will need to be a hybrid aspect to this application. I'm invisioning SSR of most recent posts and comments, with update via Sockets on load with current data, and passing of updates via sockets between builds. New builds on new posts? Or perhaps on a set schedule (to render more comments on load)? Perhaps Express Server handling the update of the blog after initial render with sessions, authentication, comments, sockets, etc. Would love input and ideas.
+
+- fork this repo, and `git clone` your fork locally
+- `yarn install`
+- create new branch
+- submit pull request
+
 ## License
 
 The MIT License (MIT)
 
-Copyright (c) 2015 gatsbyjs
 Copyright (c) 2019 Wesley L. Handy
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -41,4 +47,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-

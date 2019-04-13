@@ -12,7 +12,19 @@ import Helmet from "react-helmet"
 import SchemaOrg from "./SchemaOrg"
 import { StaticQuery, graphql } from "gatsby"
 
-function SEO({ description, lang, meta, keywords, image, title, pathname, isBlogPost , datePublished = false, dateModified = false}) {
+function SEO({
+  description,
+  lang,
+  meta,
+  keywords,
+  image,
+  title,
+  pathname,
+  isBlogPost,
+  author,
+  datePublished = false,
+  dateModified = false,
+}) {
   return (
     <StaticQuery
       query={detailsQuery}
@@ -24,11 +36,13 @@ function SEO({ description, lang, meta, keywords, image, title, pathname, isBlog
             ? `${data.site.siteMetadata.siteUrl}${image.src}`
             : null
         const metaUrl = `${data.site.siteMetadata.siteUrl}${pathname}`
-        const organization = data.site.siteMetadata.organization;
+        const organization = data.site.siteMetadata.organization
         organization.logo = {
-          url:`${data.site.siteMetadata.siteUrl}${data.logo.childImageSharp.fixed.src}`,
+          url: `${data.site.siteMetadata.siteUrl}${
+            data.logo.childImageSharp.fixed.src
+          }`,
           width: data.logo.childImageSharp.fixed.width,
-          height: data.logo.childImageSharp.height
+          height: data.logo.childImageSharp.height,
         }
         return (
           <>
@@ -77,7 +91,11 @@ function SEO({ description, lang, meta, keywords, image, title, pathname, isBlog
                 },
                 {
                   name: `google-site-verification`,
-                  content: data.site.siteMetadata.siteVerification,
+                  content: data.site.siteMetadata.siteVerification.google,
+                },
+                {
+                  name: `msvalidate.01`,
+                  content: data.site.siteMetadata.siteVerification.bing,
                 },
               ]
                 .concat(
@@ -85,7 +103,7 @@ function SEO({ description, lang, meta, keywords, image, title, pathname, isBlog
                     ? [
                         {
                           property: "image",
-                          content: metaImage
+                          content: metaImage,
                         },
                         {
                           property: "og:image",
@@ -122,16 +140,20 @@ function SEO({ description, lang, meta, keywords, image, title, pathname, isBlog
                           content: "summary",
                         },
                       ]
-                ).concat(
-                  (metaImage && metaImage.indexOf("https") > -1)
-                  ? [{
-                    propery: "twitter:image:secure_url",
-                    content: metaImage
-                  },
-                  {
-                    propery: "og:image:secure_url",
-                    content: metaImage
-                  }] : []
+                )
+                .concat(
+                  metaImage && metaImage.indexOf("https") > -1
+                    ? [
+                        {
+                          propery: "twitter:image:secure_url",
+                          content: metaImage,
+                        },
+                        {
+                          propery: "og:image:secure_url",
+                          content: metaImage,
+                        },
+                      ]
+                    : []
                 )
                 .concat(
                   keywords.length > 0
@@ -152,7 +174,7 @@ function SEO({ description, lang, meta, keywords, image, title, pathname, isBlog
               datePublished={datePublished}
               dateModified={dateModified}
               canonicalUrl={data.site.siteMetadata.siteUrl}
-              author={data.site.siteMetadata.author.name}
+              author={isBlogPost ? author : data.site.siteMetadata.author}
               organization={organization}
               defaultTitle={title}
             />
@@ -168,7 +190,7 @@ SEO.defaultProps = {
   meta: [],
   keywords: [],
   pathname: ``,
-  isBlogPost: false
+  isBlogPost: false,
 }
 
 SEO.propTypes = {
@@ -179,6 +201,7 @@ SEO.propTypes = {
   keywords: PropTypes.arrayOf(PropTypes.string),
   title: PropTypes.string.isRequired,
   pathname: PropTypes.string,
+  author: PropTypes.object,
   isBlogPost: PropTypes.bool,
   datePublished: PropTypes.string,
   dateModified: PropTypes.string,
@@ -192,11 +215,12 @@ const detailsQuery = graphql`
       siteMetadata {
         title
         siteUrl
-        siteVerification
-        description
-        author {
-            name
+        siteVerification {
+          google
+          bing
         }
+        description
+        author
         social {
           twitter
           linkedin
@@ -207,11 +231,11 @@ const detailsQuery = graphql`
         }
       }
     }
-    logo:file(relativePath:{ eq: "images/gatsby-icon.png"}) {
+    logo: file(relativePath: { eq: "images/gatsby-icon.png" }) {
       childImageSharp {
-        fixed(width:500){
+        fixed(width: 500) {
           ...GatsbyImageSharpFixed
-          height,
+          height
           width
           src
         }
